@@ -137,23 +137,43 @@ export default function MatchesScreen() {
     );
   };
   
+  const navigateToProfile = (matchId: string) => {
+    // Navigate to profile view
+    router.push({
+      pathname: '/profile/view',
+      params: { id: matchId }
+    });
+  };
+  
+  const navigateToChat = (matchId: string) => {
+    // Navigate to conversation
+    router.push({
+      pathname: '/(tabs)/messages/conversation',
+      params: { id: matchId }
+    });
+  };
+  
   const renderMatchItem = ({ item }: { item: Match }) => {
     // Calculate the width of each item (2 per row with spacing)
     const itemWidth = (SCREEN_WIDTH - (16 * 3)) / 2;
     
     return (
-      <View style={[
-        styles.matchItem, 
-        { 
-          backgroundColor: theme.colors.background.secondary,
-          width: itemWidth,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
-          elevation: 3
-        }
-      ]}>
+      <TouchableOpacity 
+        style={[
+          styles.matchItem, 
+          { 
+            backgroundColor: theme.colors.background.secondary,
+            width: itemWidth,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 4,
+            elevation: 3
+          }
+        ]}
+        onPress={() => navigateToProfile(item.id)}
+        activeOpacity={0.9}
+      >
         <View style={styles.matchImageContainer}>
           <Image source={{ uri: item.image }} style={styles.matchImage} />
           {item.isNew && (
@@ -187,8 +207,18 @@ export default function MatchesScreen() {
               />
             </View>
           </View>
+          
+          <TouchableOpacity 
+            style={[
+              styles.messageButton,
+              { backgroundColor: theme.colors.primary }
+            ]}
+            onPress={() => navigateToChat(item.id)}
+          >
+            <Text style={styles.messageButtonText}>Message</Text>
+          </TouchableOpacity>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
   
@@ -371,6 +401,18 @@ const styles = StyleSheet.create({
     height: '100%',
     borderRadius: 2,
   },
+  messageButton: {
+    marginTop: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    alignItems: 'center',
+  },
+  messageButtonText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '600',
+  },
   emptyContainer: {
     flex: 1,
     alignItems: 'center',
@@ -396,4 +438,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
   },
-}); 
+});

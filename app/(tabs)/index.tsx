@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, View, Text, Animated, PanResponder, Image, TouchableOpacity, Dimensions, SafeAreaView, FlatList, Modal } from 'react-native';
+import { StyleSheet, View, Text, Animated, PanResponder, Image, TouchableOpacity, Dimensions, SafeAreaView, FlatList, Modal, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Heart, X, Star, MessageCircle, Sliders as Filter, ChevronLeft, Share2, MoreHorizontal } from 'lucide-react-native';
 import { useTheme } from '@/hooks/useTheme';
 import { router } from 'expo-router';
+import MomentsRow from '@/components/MomentsRow';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -635,19 +636,25 @@ export default function DiscoverScreen() {
         backgroundColor: theme.colors.background.primary
       }
     ]}>
-      <View style={styles.header}>
-        <Text style={[
-          styles.headerTitle,
-          { color: theme.colors.text.primary }
-        ]}>Discover</Text>
-        <TouchableOpacity style={[
-          styles.filterButton,
-          { backgroundColor: theme.colors.background.secondary }
-        ]}>
-          <Filter size={22} color={theme.colors.text.primary} />
-        </TouchableOpacity>
-      </View>
-      <View style={styles.cardsContainer}>{renderCards()}</View>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        <View style={styles.header}>
+          <Text style={[
+            styles.headerTitle,
+            { color: theme.colors.text.primary }
+          ]}>Discover</Text>
+          <TouchableOpacity style={[
+            styles.filterButton,
+            { backgroundColor: theme.colors.background.secondary }
+          ]}>
+            <Filter size={22} color={theme.colors.text.primary} />
+          </TouchableOpacity>
+        </View>
+        
+        {/* Moments Row */}
+        <MomentsRow />
+        
+        <View style={styles.cardsContainer}>{renderCards()}</View>
+      </ScrollView>
       {currentIndex < profiles.length && (
         <View style={styles.actionsContainer}>
           <TouchableOpacity 
@@ -688,6 +695,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  scrollView: {
+    flex: 1,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -712,7 +722,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   cardsContainer: {
-    flex: 1,
+    height: SCREEN_HEIGHT * 0.65,
     marginTop: 10,
     marginBottom: 20,
     alignItems: 'center',

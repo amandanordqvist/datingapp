@@ -11,6 +11,7 @@ import {
 } from '@expo-google-fonts/inter';
 import { SplashScreen } from 'expo-router';
 import { ThemeProvider, useTheme } from '@/hooks/useTheme';
+import { MomentsProvider } from '@/hooks/useMoments';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Prevent splash screen from auto-hiding
@@ -81,6 +82,13 @@ const NavigationContent = () => {
             presentation: 'modal',
           }}
         />
+        <Stack.Screen 
+          name="profile/view" 
+          options={{
+            headerShown: false,
+            presentation: 'card',
+          }}
+        />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style={isDark ? "light" : "dark"} />
@@ -111,7 +119,9 @@ export default function RootLayout() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <NavigationContent />
+        <MomentsProvider>
+          <NavigationContent />
+        </MomentsProvider>
       </AuthProvider>
     </ThemeProvider>
   );

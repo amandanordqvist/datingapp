@@ -6,6 +6,8 @@ import { useState, useEffect, useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/app/_layout';
+import IceBreaker from '@/components/IceBreaker';
+import * as Haptics from 'expo-haptics';
 
 interface Message {
   id: number;
@@ -351,7 +353,16 @@ export default function ConversationScreen() {
         </TouchableOpacity>
         
         {chatUser && (
-          <View style={styles.avatarContainer}>
+          <TouchableOpacity 
+            style={styles.avatarContainer}
+            onPress={() => {
+              router.push({
+                pathname: '/profile/view',
+                params: { id: chatId }
+              });
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            }}
+          >
             <Image 
               source={{ uri: chatUser.image }} 
               style={styles.avatar}
@@ -373,7 +384,7 @@ export default function ConversationScreen() {
                 </Text>
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
         )}
       </View>
 
@@ -420,10 +431,62 @@ export default function ConversationScreen() {
         </View>
       )}
 
+      {/* Quick Actions */}
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.quickActionsContainer,
+          { backgroundColor: theme.colors.background.secondary }
+        ]}
+      >
+        <IceBreaker onSend={(text) => {
+          setMessage(text);
+          // Small delay to ensure the message is set before sending
+          setTimeout(() => {
+            sendMessage();
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          }, 100);
+        }} />
+        
+        <TouchableOpacity 
+          style={[
+            styles.quickActionButton,
+            { backgroundColor: theme.colors.background.tertiary }
+          ]}
+        >
+          <Camera size={20} color={theme.colors.text.secondary} />
+          <Text style={[
+            styles.quickActionText,
+            { color: theme.colors.text.secondary }
+          ]}>
+            Photo
+          </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={[
+            styles.quickActionButton,
+            { backgroundColor: theme.colors.background.tertiary }
+          ]}
+        >
+          <Mic size={20} color={theme.colors.text.secondary} />
+          <Text style={[
+            styles.quickActionText,
+            { color: theme.colors.text.secondary }
+          ]}>
+            Voice
+          </Text>
+        </TouchableOpacity>
+      </ScrollView>
+
       <View style={[styles.inputContainer, { paddingBottom: insets.bottom || 20 }]}>
         <TouchableOpacity 
           style={styles.attachButton}
-          onPress={() => setShowAttachments(!showAttachments)}
+          onPress={() => {
+            setShowAttachments(!showAttachments);
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }}
         >
           <Paperclip size={20} color={theme.colors.text.secondary} />
         </TouchableOpacity>
@@ -439,19 +502,25 @@ export default function ConversationScreen() {
         />
         
         {!message.trim() ? (
-          <TouchableOpacity style={styles.emojiButton}>
+          <TouchableOpacity 
+            style={styles.emojiButton}
+            onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+          >
             <Smile size={20} color={theme.colors.text.secondary} />
           </TouchableOpacity>
         ) : (
           <TouchableOpacity 
             style={[styles.sendButton, isSending && styles.sendButtonDisabled]}
-            onPress={sendMessage}
+            onPress={() => {
+              sendMessage();
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            }}
             disabled={isSending}
           >
             {isSending ? (
               <ActivityIndicator size="small" color="#FFFFFF" />
             ) : (
-              <Send size={20} color={theme.colors.text.primary} />
+              <Send size={20} color="#FFFFFF" />
             )}
           </TouchableOpacity>
         )}
@@ -681,6 +750,26 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 8,
   },
+  quickActionsContainer: {
+    flexDirection: 'row',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#2D2D2D',
+  },
+  quickActionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    marginRight: 8,
+  },
+  quickActionText: {
+    fontSize: 14,
+    fontWeight: '500',
+    marginLeft: 6,
+  },
   input: {
     flex: 1,
     height: 40,
@@ -688,4 +777,4 @@ const styles = StyleSheet.create({
     color: '#333333',
     padding: 0,
   },
-}); 
+});
